@@ -31,20 +31,24 @@
 data calc_i(ph phase){
     #pragma HLS inline recursive
     ph_f phase_pi;
-    // Bitwize interpretation
-    phase_pi(BW_PHASE-1, 0) = phase(BW_PHASE-1, 0);
-
-    return hls::cospi(phase_pi);
-}
-
-data calc_q(ph phase){
-    #pragma HLS inline recursive
-    ph_f phase_pi;
     ph_f offset = 0.5;
     // Bitwize interpretation
     phase_pi(BW_PHASE-1, 0) = phase(BW_PHASE-1, 0);
 
-    return hls::cospi(phase_pi - offset);
+    return hls::cospi(phase_pi);
+    //return hls::cospi(phase_pi - offset);
+}
+
+data calc_q(ph phase){
+    #pragma HLS inline recursive
+    ph phase_new = phase + (1 << (BW_PHASE - 2));
+    ph_f phase_pi;
+    //ph_f offset = 0.5;
+    // Bitwize interpretation
+    phase_pi(BW_PHASE-1, 0) = phase_new(BW_PHASE-1, 0);
+
+    //return hls::cospi(phase_pi - offset);
+    return hls::cospi(phase_pi);
 }
 
 void calc_iq(ph pinc,
@@ -53,7 +57,7 @@ void calc_iq(ph pinc,
              data& data_i,
              data& data_q)
 {
-    #pragma HLS PIPELINE II=1
+    #pragma HLS DATAFLOW
 	ph phase_now;
     data i_tmp = calc_i(phase + pinc*stage);
     data q_tmp = calc_q(phase + pinc*stage);

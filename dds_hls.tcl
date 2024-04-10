@@ -13,7 +13,7 @@ open_solution -reset solution1 -flow_target vivado
 
 # Define technology and clock rate
 set_part {xczu48dr-ffvg1517-2-e}
-create_clock -period 3.255
+create_clock -period 3.0
 set_clock_uncertainty 0.2
 config_rtl -reset all
 

@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
 	hls::stream<data_tot> outFifo_I("outFIFO_I");
 	hls::stream<data_tot> outFifo_Q("outFIFO_Q");
 
-	const int length = 100;
-	const ph pinc = 256;
+	const int length = 10000;
+	const ph pinc = 100;
 
     std::string currentDirectory = "/home/jsuzuki/fpga_projects/dds_hls/";
 
