@@ -33,39 +33,21 @@ const ph phase_offset_i = 0;
 data calc_i(ph phase){
     #pragma HLS inline recursive
     ph_f phase_pi;
-    //ph_f offset = 0.5;
     // Bitwize interpretation
     phase_pi(BW_PHASE-1, 0) = phase(BW_PHASE-1, 0);
 
     return hls::cospi(phase_pi);
-    //return hls::cospi(phase_pi - offset);
 }
 
-data calc_q(ph phase){
-    #pragma HLS inline recursive
-    ph_f phase_pi;
-    //ph_f offset = 0.5;
-    // Bitwize interpretation
-    phase_pi(BW_PHASE-1, 0) = phase(BW_PHASE-1, 0);
-
-    //return hls::cospi(phase_pi - offset);
-    return hls::cospi(phase_pi);
-}
-
-void calc_iq(ph pinc,
-             ph phase_i,
-             ph phase_q,
-             ph stage,
-             data& data_i,
-             data& data_q)
+void calc(ph pinc,
+          ph phase,
+          ph stage,
+          data& data_out)
 {
     #pragma HLS PIPELINE II=1
-	ph phase_now;
-    data i_tmp = calc_i(phase_i + pinc*stage);
-    data q_tmp = calc_q(phase_q + pinc*stage);
+    data tmp = calc_i(phase + pinc*stage);
 
-    data_i = i_tmp;
-    data_q = q_tmp;
+    data_out = tmp;
 }
 
 void push(data buffer[N_CH], hls::stream<data_tot>& out){
@@ -111,7 +93,8 @@ void dds_hls(ph pinc,
 
     calc_loop: for(int i = 0; i < N_CH; i++){
         #pragma HLS unroll
-        calc_iq(pinc, phase_tmp_i, phase_tmp_q, i, i_buffer[i], q_buffer[i]);
+        calc(pinc, phase_tmp_i, i, i_buffer[i]);
+        calc(pinc, phase_tmp_q, i, q_buffer[i]);
     }
     push(i_buffer, data_i);
     push(q_buffer, data_q);
